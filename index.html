@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>RevIdle</title>
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <div id="app">
+      <header class="multRibbon" aria-label="Layer multipliers">
+        <div id="mult-strip" class="multRibbon__row"></div>
+      </header>
+
+      <div class="gameShell">
+        <aside class="layerPanel">
+          <div class="layerPanel__head">
+            <span class="layerPanel__title">Colors</span>
+            <span class="layerPanel__buys">
+              <button type="button" class="btn btn--tiny btn--ghost" id="buy-x1">×1</button>
+              <button type="button" class="btn btn--tiny btn--ghost" id="buy-x10">×10</button>
+              <button type="button" class="btn btn--tiny btn--ghost" id="buy-max">Max</button>
+            </span>
+          </div>
+          <div id="generators-list" class="layerList"></div>
+        </aside>
+
+        <div class="centerColumn">
+          <section class="centerStage" id="panel-revolution">
+            <div class="scoreRow">
+              <span class="scoreHero__value" id="score-value">0</span>
+              <span class="rotDot">◎</span>
+            </div>
+            <div class="mainLayout">
+              <div class="canvasWrap">
+                <canvas id="rotation-canvas" width="340" height="340" aria-label="Circle progress"></canvas>
+              </div>
+              <div class="rightBlock">
+                <div class="scoreStats">
+                  <div class="scoreStats__line" id="per-rev-rate">+0 / sec</div>
+                  <div class="scoreStats__line" id="per-rev-gain">+0 / rev</div>
+                </div>
+                <div class="canvasActions">
+                  <button type="button" class="btn btn--tiny btn--ghost" id="btn-layer-max" title="Max affordable levels">MAX</button>
+                  <button type="button" class="btn btn--tiny btn--ghost" id="btn-ascend-all" title="Ascend all eligible colors">ASC ALL</button>
+                </div>
+                <aside class="prestigeCard" id="prestige-card">
+                  <div class="prestigeCard__title">Prestige Window</div>
+                  <div class="prestigeCard__row">
+                    <span class="prestigeCard__k">P.Exponent</span>
+                    <span class="prestigeCard__v" id="prestige-exp-line">^1.00 → ^1.00</span>
+                  </div>
+                  <div class="prestigeCard__row">
+                    <span class="prestigeCard__k">P.Mult</span>
+                    <span class="prestigeCard__v" id="prestige-mult-line">×1 → ×1</span>
+                  </div>
+                  <p class="prestigeCard__hint muted" id="prestige-hint">Reach 10B score to unlock.</p>
+                  <button type="button" class="btn btn--tiny btn--primary" id="btn-prestige" disabled>Prestige</button>
+                </aside>
+                <button type="button" class="btn btn--promote" id="btn-promote" disabled>Promote!</button>
+              </div>
+            </div>
+            <div class="infinityTrack" aria-label="Progress toward Infinity">
+              <div class="infinityTrack__label">Progress to Infinity: <strong id="infinity-progress-pct">0.00%</strong></div>
+              <div class="infinityTrack__bar">
+                <div class="infinityTrack__fill" id="infinity-progress-fill"></div>
+              </div>
+            </div>
+            <div class="centerFooter">
+              <span class="muted" id="stat-revolutions">0</span> revolutions
+              <span class="centerFooter__sep">·</span>
+              <span class="centerFooter__actions">
+                <button type="button" class="btn btn--link" id="btn-hard-reset">Hard reset</button>
+                <button type="button" class="btn btn--tiny btn--ghost devSpeedBtn" id="btn-dev-speed" title="Dev: ×10 sim speed">Dev ×1</button>
+              </span>
+            </div>
+          </section>
+
+          <section class="sidePanel" id="panel-infinity" hidden>
+            <div class="sidePanel__head">
+              <h2 class="sidePanel__title">Infinity</h2>
+              <p class="sidePanel__sub muted">
+                At <strong>1.79e308</strong> score you gain <strong>+1 IP</strong> and the run resets (prestige &amp; promotions). Achievements &amp; Infinity upgrades stay.
+              </p>
+            </div>
+            <div class="kv">
+              <div class="kv__row"><div class="kv__k">Infinity Points</div><div class="kv__v" id="stat-ip">0</div></div>
+              <div class="kv__row"><div class="kv__k">Infinities</div><div class="kv__v" id="stat-infinities">0</div></div>
+              <div class="kv__row"><div class="kv__k">Ready</div><div class="kv__v" id="stat-infinity-ready">No</div></div>
+            </div>
+            <button type="button" class="btn btn--primary" id="btn-infinity" disabled>Perform Infinity</button>
+            <div class="spacer"></div>
+            <div class="sidePanel__head"><h3 class="sidePanel__title sidePanel__title--sm">Infinity upgrades</h3></div>
+            <div id="infinity-upgrades" class="upgradeList"></div>
+          </section>
+
+          <section class="sidePanel" id="panel-achievements" hidden>
+            <div class="sidePanel__head">
+              <h2 class="sidePanel__title">Achievements</h2>
+              <p class="sidePanel__sub muted">Small permanent bonuses.</p>
+            </div>
+            <div id="achievements-list" class="achList"></div>
+          </section>
+
+          <section class="sidePanel" id="panel-stats" hidden>
+            <div class="sidePanel__head"><h2 class="sidePanel__title">Statistics</h2></div>
+            <div class="kv">
+              <div class="kv__row"><div class="kv__k">Total score earned</div><div class="kv__v" id="stat-total-earned">0</div></div>
+              <div class="kv__row"><div class="kv__k">Total purchases</div><div class="kv__v" id="stat-total-purchases">0</div></div>
+              <div class="kv__row"><div class="kv__k">Prestiges</div><div class="kv__v" id="stat-total-prestiges">0</div></div>
+              <div class="kv__row"><div class="kv__k">P.Mult</div><div class="kv__v" id="stat-global-mult">×1</div></div>
+              <div class="kv__row"><div class="kv__k">P.Exponent</div><div class="kv__v" id="stat-p-exp">^1.00</div></div>
+              <div class="kv__row"><div class="kv__k">Circle prod × P.Mult</div><div class="kv__v" id="stat-total-mult">×1</div></div>
+              <div class="kv__row"><div class="kv__k">Score / sec</div><div class="kv__v" id="stat-score-per-sec">0</div></div>
+            </div>
+          </section>
+        </div>
+
+        <nav class="navRail" aria-label="Main navigation">
+          <button type="button" class="navRail__btn navRail__btn--active" data-panel="revolution" title="Revolution">
+            <span class="navRail__icon">◎</span><span class="navRail__label">Main</span>
+          </button>
+          <button type="button" class="navRail__btn" data-panel="infinity" title="Infinity">
+            <span class="navRail__icon">∞</span><span class="navRail__label">Infinity</span>
+          </button>
+          <button type="button" class="navRail__btn navRail__btn--disabled" disabled title="Later">
+            <span class="navRail__icon">✦</span><span class="navRail__label">Eternity</span>
+          </button>
+          <button type="button" class="navRail__btn" data-panel="achievements" title="Achievements">
+            <span class="navRail__icon">🏅</span><span class="navRail__label">Achieve</span>
+          </button>
+          <button type="button" class="navRail__btn" data-panel="stats" title="Statistics">
+            <span class="navRail__icon">▤</span><span class="navRail__label">Stats</span>
+          </button>
+        </nav>
+      </div>
+    </div>
+
+    <div class="modalOverlay" id="promote-modal" hidden>
+      <div class="modal">
+        <div class="modal__head">
+          <div>
+            <div class="modal__title">Promotions Window</div>
+            <div class="modal__sub muted">Pick one track. Spends promotion EXP and resets the run (deeper than prestige).</div>
+          </div>
+          <button type="button" class="btn btn--tiny btn--ghost" id="btn-promote-close">Close</button>
+        </div>
+        <div class="modal__body" id="promote-options"></div>
+      </div>
+    </div>
+
+    <script defer src="./main.js"></script>
+  </body>
+</html>
