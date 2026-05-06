@@ -5,6 +5,8 @@
   const SAVE_KEY_LEGACY = "revidle_save_v1";
   const INFINITY_THRESHOLD = 1.79e308;
   const PRESTIGE_UNLOCK_SCORE = 1e10;
+  /** Extra ^P.Exp per log10(score) step after the first (L−10); tuned so ~1e20 preview P.Mult (delta≈20) lands near ^1.10. */
+  const PRESTIGE_EXP_PER_DELTA_AFTER_FIRST = 0.07 / 19;
   const PROD_MULT_SOFTCAP = 1e30;
   const PER_CIRCLE_MULT_SOFTCAP = 1e10;
   const EPS = 1e-6;
@@ -73,7 +75,8 @@
     const delta = Math.max(0, Math.min(299, L - 9));
     const nextPMult = Math.max(curPM, 1 + Math.pow(10, delta));
     const deltaExp = Math.max(0, L - 9);
-    const targetPExp = 1 + 0.03 * Math.min(1, deltaExp) + 0.002 * Math.max(0, deltaExp - 1);
+    const targetPExp =
+      1 + 0.03 * Math.min(1, deltaExp) + PRESTIGE_EXP_PER_DELTA_AFTER_FIRST * Math.max(0, deltaExp - 1);
     const nextPExp = Math.max(curPE, Math.min(22, targetPExp));
     return { nextPMult, nextPExp };
   }
